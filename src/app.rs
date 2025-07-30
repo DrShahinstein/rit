@@ -1,21 +1,21 @@
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use ratatui::{
-  DefaultTerminal, Frame,
-  buffer::Buffer,
-  layout::Rect,
-  style::Stylize,
-  symbols::border,
-  text::{Line, Text},
-  widgets::{Block, Paragraph, Widget},
-};
+use ratatui::{DefaultTerminal, Frame};
 use std::io;
 
-use crate::git::run_git;
+use crate::interface::Renderable;
+
+#[derive(Debug, Default)]
+enum RenderChoice {
+  #[default]
+  MainMenu,
+  CommitMenu,
+}
 
 #[derive(Debug, Default)]
 pub struct App {
-  git_adds: Vec<String>,
-  git_commit: String,
+  render: RenderChoice,
+  staged_files: Vec<String>,
+  commit_msg: String,
   exit: bool,
 }
 
@@ -29,7 +29,14 @@ impl App {
   }
 
   fn draw(&self, f: &mut Frame) {
-    f.render_widget(self, f.area());
+    match self.render {
+      RenderChoice::MainMenu => {
+        self.render_main_menu(f);
+      }
+      RenderChoice::CommitMenu => {
+        self.render_commit_menu(f);
+      }
+    }
   }
 
   fn handle_events(&mut self) -> io::Result<()> {
@@ -45,18 +52,14 @@ impl App {
   fn handle_key_event(&mut self, key_event: KeyEvent) {
     match key_event.code {
       KeyCode::Char('q') => self.exit(),
+      KeyCode::Char('c') => {
+        self.render = RenderChoice::CommitMenu;
+      }
       _ => {}
     }
   }
 
   fn exit(&mut self) {
     self.exit = true;
-  }
-}
-
-impl Widget for &App {
-  fn render(self, area: Rect, buf: &mut Buffer) {
-    let status = run_git("status").unwrap_or_else(|e| e.to_string());
-    Paragraph::new(status).centered().render(area, buf);
   }
 }
