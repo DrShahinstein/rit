@@ -14,9 +14,10 @@ enum RenderChoice {
 #[derive(Debug, Default)]
 pub struct App {
   render: RenderChoice,
-  staged_files: Vec<String>,
-  commit_msg: String,
-  exit: bool,
+  pub staged_files: Vec<String>,
+  pub commit_msg: String,
+  pub selected_index: u8,
+  pub exit: bool,
 }
 
 impl App {
