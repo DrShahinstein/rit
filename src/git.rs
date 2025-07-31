@@ -17,3 +17,7 @@ pub fn get_changed_files() -> Result<Vec<String>, String> {
   let output = run_git(&["status", "--porcelain"]);
   output.map(|s| s.lines().map(|line| line[3..].to_string()).collect())
 }
+
+pub fn get_current_branch() -> Result<String, String> {
+  run_git(&["branch", "--show-current"]).map(|s| s.trim().to_string())
+}
