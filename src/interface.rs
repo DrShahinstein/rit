@@ -14,12 +14,11 @@ impl Renderable for App {
   fn render_main_menu(&mut self, f: &mut Frame) {
     let layout = Layout::default()
       .direction(Direction::Vertical)
-      .constraints([Constraint::Length(3), Constraint::Min(0)])
+      .constraints([Constraint::Length(1), Constraint::Min(0)])
       .split(f.area());
 
     let branch_text = format!("branch: {}", self.current_branch);
     let header = Paragraph::new(Text::from(branch_text).fg(Color::Green))
-      .block(Block::default().borders(Borders::BOTTOM))
       .alignment(Alignment::Center);
     f.render_widget(header, layout[0]);
 
