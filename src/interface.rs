@@ -12,7 +12,7 @@ pub trait Renderable {
 
 impl Renderable for App {
   fn render_main_menu(&mut self, f: &mut Frame) {
-    let main_layout = Layout::default()
+    let layout = Layout::default()
       .direction(Direction::Vertical)
       .constraints([Constraint::Length(3), Constraint::Min(0)])
       .split(f.area());
@@ -21,7 +21,7 @@ impl Renderable for App {
     let header = Paragraph::new(Text::from(branch_text).fg(Color::Green))
       .block(Block::default().borders(Borders::BOTTOM))
       .alignment(Alignment::Center);
-    f.render_widget(header, main_layout[0]);
+    f.render_widget(header, layout[0]);
 
     let items: Vec<ListItem> = self
       .changed_files
@@ -59,7 +59,7 @@ impl Renderable for App {
       )
       .highlight_symbol(">> ");
 
-    f.render_stateful_widget(changes_list, main_layout[1], &mut self.main_menu_state);
+    f.render_stateful_widget(changes_list, layout[1], &mut self.main_menu_state);
   }
 
   fn render_commit_menu(&mut self, f: &mut Frame) {
