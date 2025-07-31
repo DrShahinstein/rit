@@ -1,4 +1,5 @@
 use crate::app::App;
+use crate::git::FileStatus;
 use ratatui::{
   prelude::*,
   widgets::{Block, Borders, List, ListItem, Paragraph},
@@ -26,13 +27,25 @@ impl Renderable for App {
       .changed_files
       .iter()
       .enumerate()
-      .map(|(i, file)| {
+      .map(|(i, file_info)| {
         let prefix = if self.staged_indices.contains(&i) {
           Span::styled("[x] ", Style::default().fg(Color::LightGreen))
         } else {
           Span::styled("[ ] ", Style::default().fg(Color::White))
         };
-        let line = Line::from(vec![prefix, Span::raw(file.trim())]);
+
+        let status_span = match file_info.status {
+          FileStatus::Untracked => Span::styled("(NEW)", Style::default().fg(Color::White).bold()),
+          FileStatus::Modified  => Span::styled("M", Style::default().fg(Color::Green)),
+          FileStatus::Deleted   => Span::styled("D", Style::default().fg(Color::Red)),
+          FileStatus::Added     => Span::styled("A", Style::default().fg(Color::Green)),
+          FileStatus::Renamed   => Span::styled("R", Style::default().fg(Color::Yellow)),
+          _ => Span::raw(""),
+        };
+
+        let path_span = Span::raw(file_info.path.trim());
+        let line = Line::from(vec![prefix, path_span, Span::raw(" "), status_span]);
+
         ListItem::new(line)
       })
       .collect();
