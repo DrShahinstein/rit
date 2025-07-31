@@ -61,7 +61,7 @@ impl KeysInteractable for App {
 
   fn toggle_stage_selection(&mut self) {
     if let Some(selected_index) = self.main_menu_state.selected() {
-      let file_path = &self.changed_files[selected_index];
+      let file_path = &self.changed_files[selected_index].path;
       if self.staged_indices.contains(&selected_index) {
         let _ = git::run_git(&["reset", "HEAD", "--", file_path]);
         self.staged_indices.remove(&selected_index);
