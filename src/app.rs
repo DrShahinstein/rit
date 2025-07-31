@@ -41,12 +41,15 @@ impl App {
   pub fn new() -> Self {
     let mut app = App {
       current_branch: git::get_current_branch().unwrap_or_else(|_| "detached".to_string()),
-      changed_files: git::get_changed_files().unwrap_or_default(),
+      changed_files:  git::get_changed_files().unwrap_or_default(),
+      staged_indices: git::get_staged_indices().unwrap_or_default(),
       ..Default::default()
     };
+
     if !app.changed_files.is_empty() {
       app.main_menu_state.select(Some(0));
     }
+
     app
   }
 
