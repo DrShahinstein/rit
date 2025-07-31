@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::process::Command;
 
 pub fn run_git(commands: &[&str]) -> Result<String, String> {
@@ -20,4 +21,14 @@ pub fn get_changed_files() -> Result<Vec<String>, String> {
 
 pub fn get_current_branch() -> Result<String, String> {
   run_git(&["branch", "--show-current"]).map(|s| s.trim().to_string())
+}
+
+pub fn get_staged_indices() -> Result<HashSet<usize>, String> {
+  let output = run_git(&["diff", "--cached", "--name-only"]);
+  output.map(|s| {
+    s.lines()
+      .enumerate()
+      .filter_map(|(i, line)| if !line.is_empty() { Some(i) } else { None })
+      .collect()
+  })
 }
