@@ -16,7 +16,7 @@ pub enum RenderChoice {
 #[derive(Debug)]
 pub struct App {
   pub render: RenderChoice,
-  pub changed_files: Vec<String>,
+  pub changed_files: Vec<git::ChangedFile>,
   pub staged_indices: HashSet<usize>,
   pub commit_msg: String,
   pub main_menu_state: ListState,
