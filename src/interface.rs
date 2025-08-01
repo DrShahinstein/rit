@@ -15,7 +15,11 @@ impl Renderable for App {
   fn render_main_menu(&mut self, f: &mut Frame) {
     let layout = Layout::default()
       .direction(Direction::Vertical)
-      .constraints([Constraint::Length(1), Constraint::Min(0)])
+      .constraints([
+        Constraint::Length(1),
+        Constraint::Min(0),
+        Constraint::Length(1),
+      ])
       .split(f.area());
 
     let branch_text = format!("branch: {}", self.current_branch);
@@ -59,6 +63,11 @@ impl Renderable for App {
       .highlight_symbol(">> ");
 
     f.render_stateful_widget(changes_list, layout[1], &mut self.main_menu_state);
+
+    let footer = Paragraph::new("q: quit    c: commit")
+      .alignment(Alignment::Center)
+      .style(Style::default().fg(Color::LightBlue));
+    f.render_widget(footer, layout[2]);
   }
 
   fn render_commit_menu(&mut self, f: &mut Frame) {
