@@ -23,7 +23,8 @@ impl Renderable for App {
       .split(f.area());
 
     let branch_text = format!("branch: {}", self.current_branch);
-    let header = Paragraph::new(Text::from(branch_text).fg(Color::Green)).alignment(Alignment::Center);
+    let color = if self.current_branch == "detached" {Color::Red} else {Color::Green};
+    let header = Paragraph::new(Text::from(branch_text).fg(color)).alignment(Alignment::Center);
     f.render_widget(header, layout[0]);
 
     let items: Vec<ListItem> = self
