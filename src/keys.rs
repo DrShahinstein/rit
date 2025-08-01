@@ -26,8 +26,37 @@ impl KeysInteractable for App {
 
   fn handle_commit_menu_keys(&mut self, key_event: KeyEvent) {
     match key_event.code {
-      KeyCode::Char('q') => self.exit(),
-      _ => todo!("codecodecodecodecode"),
+      KeyCode::Char(c) => {
+        self.commit_msg.insert(self.cursor_pos, c);
+        self.cursor_pos += 1;
+      }
+      KeyCode::Backspace => {
+        if self.cursor_pos > 0 {
+          self.cursor_pos -= 1;
+          self.commit_msg.remove(self.cursor_pos);
+        }
+      }
+      KeyCode::Left => {
+        if self.cursor_pos > 0 {
+          self.cursor_pos -= 1;
+        }
+      }
+      KeyCode::Right => {
+        if self.cursor_pos < self.commit_msg.len() {
+          self.cursor_pos += 1;
+        }
+      }
+      KeyCode::Enter => {
+        if !self.commit_msg.is_empty() {
+          self.commit_changes();
+        }
+      }
+      KeyCode::Esc => {
+        self.render = RenderChoice::MainMenu;
+        self.commit_msg.clear();
+        self.cursor_pos = 0;
+      }
+      _ => {}
     }
   }
 
