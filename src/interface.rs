@@ -2,7 +2,7 @@ use crate::app::App;
 use crate::git::FileStatus;
 use ratatui::{
   prelude::*,
-  widgets::{Block, Borders, List, ListItem, Paragraph},
+  widgets::{Block, Borders, Clear, List, ListItem, Paragraph},
 };
 
 pub trait Renderable {
@@ -18,8 +18,7 @@ impl Renderable for App {
       .split(f.area());
 
     let branch_text = format!("branch: {}", self.current_branch);
-    let header = Paragraph::new(Text::from(branch_text).fg(Color::Green))
-      .alignment(Alignment::Center);
+    let header = Paragraph::new(Text::from(branch_text).fg(Color::Green)).alignment(Alignment::Center);
     f.render_widget(header, layout[0]);
 
     let items: Vec<ListItem> = self
@@ -62,6 +61,43 @@ impl Renderable for App {
   }
 
   fn render_commit_menu(&mut self, f: &mut Frame) {
-    // codecodecodecodecode
+    self.render_main_menu(f);
+
+    let popup_area = centered_rect(60, 20, f.area());
+    let commit_input = Paragraph::new(self.commit_msg.as_str())
+      .style(Style::default().fg(Color::White))
+      .block(
+        Block::default()
+          .borders(Borders::ALL)
+          .title("Commit Message")
+          .border_style(Style::default().fg(Color::LightBlue)),
+      );
+
+    f.render_widget(Clear, popup_area);
+    f.render_widget(commit_input, popup_area);
+    f.set_cursor_position(Position::new(
+      popup_area.x + 1 + self.cursor_pos as u16,
+      popup_area.y + 1,
+    ));
   }
+}
+
+fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+  let popup_layout = Layout::default()
+    .direction(Direction::Vertical)
+    .constraints([
+      Constraint::Percentage((100 - percent_y) / 2),
+      Constraint::Percentage(percent_y),
+      Constraint::Percentage((100 - percent_y) / 2),
+    ])
+    .split(r);
+
+  Layout::default()
+    .direction(Direction::Horizontal)
+    .constraints([
+      Constraint::Percentage((100 - percent_x) / 2),
+      Constraint::Percentage(percent_x),
+      Constraint::Percentage((100 - percent_x) / 2),
+    ])
+    .split(popup_layout[1])[1]
 }
