@@ -95,3 +95,7 @@ pub fn get_staged_indices() -> Result<HashSet<usize>, String> {
 pub fn get_current_branch() -> Result<String, String> {
   run_git(&["branch", "--show-current"]).map(|s| s.trim().to_string())
 }
+
+pub fn commit(msg: &str) -> Result<String, String> {
+  run_git(&["commit", "-m", msg])
+}
