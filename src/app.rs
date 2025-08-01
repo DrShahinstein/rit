@@ -19,6 +19,7 @@ pub struct App {
   pub changed_files: Vec<git::ChangedFile>,
   pub staged_indices: HashSet<usize>,
   pub commit_msg: String,
+  pub cursor_pos: usize,
   pub main_menu_state: ListState,
   pub current_branch: String,
   pub exit: bool,
@@ -31,6 +32,7 @@ impl Default for App {
       changed_files: Vec::new(),
       staged_indices: HashSet::new(),
       commit_msg: String::new(),
+      cursor_pos: 0,
       main_menu_state: ListState::default(),
       current_branch: "none".to_string(),
       exit: false,
@@ -80,9 +82,20 @@ impl App {
 
   fn handle_key_event(&mut self, key_event: KeyEvent) {
     match self.render {
-      RenderChoice::MainMenu   => self.handle_main_menu_keys(key_event),
+      RenderChoice::MainMenu => self.handle_main_menu_keys(key_event),
       RenderChoice::CommitMenu => self.handle_commit_menu_keys(key_event),
     }
+  }
+
+  pub fn commit_changes(&mut self) {
+    if git::commit(&self.commit_msg).is_ok() {
+      self.changed_files = git::get_changed_files().unwrap_or_default();
+      self.staged_indices = git::get_staged_indices().unwrap_or_default();
+      self.commit_msg.clear();
+      self.cursor_pos = 0;
+      self.render = RenderChoice::MainMenu;
+      self.main_menu_state.select(Some(0));
+    } // else
   }
 
   pub fn exit(&mut self) {
