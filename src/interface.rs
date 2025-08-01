@@ -2,7 +2,7 @@ use crate::app::App;
 use crate::git::FileStatus;
 use ratatui::{
   prelude::*,
-  widgets::{Block, Borders, Clear, List, ListItem, Paragraph},
+  widgets::{Block, Borders, Clear, List, ListItem, Paragraph, Wrap},
 };
 
 pub trait Renderable {
@@ -66,6 +66,7 @@ impl Renderable for App {
     let popup_area = centered_rect(60, 20, f.area());
     let commit_input = Paragraph::new(self.commit_msg.as_str())
       .style(Style::default().fg(Color::White))
+      .wrap(Wrap { trim: false })
       .block(
         Block::default()
           .borders(Borders::ALL)
