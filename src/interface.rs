@@ -1,5 +1,6 @@
 use crate::app::App;
 use crate::git::FileStatus;
+use crate::interface_helpers;
 use ratatui::{
   prelude::*,
   widgets::{Block, Borders, Clear, List, ListItem, Paragraph, Wrap},
@@ -63,7 +64,7 @@ impl Renderable for App {
   fn render_commit_menu(&mut self, f: &mut Frame) {
     self.render_main_menu(f);
 
-    let popup_area = centered_rect(60, 20, f.area());
+    let popup_area = interface_helpers::centered_rect(60, 20, f.area());
     let commit_input = Paragraph::new(self.commit_msg.as_str())
       .style(Style::default().fg(Color::White))
       .wrap(Wrap { trim: false })
@@ -76,29 +77,6 @@ impl Renderable for App {
 
     f.render_widget(Clear, popup_area);
     f.render_widget(commit_input, popup_area);
-    f.set_cursor_position(Position::new(
-      popup_area.x + 1 + self.cursor_pos as u16,
-      popup_area.y + 1,
-    ));
+    interface_helpers::make_cursor_aiming(f, popup_area, self.cursor_pos, &self.commit_msg);
   }
-}
-
-fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
-  let popup_layout = Layout::default()
-    .direction(Direction::Vertical)
-    .constraints([
-      Constraint::Percentage((100 - percent_y) / 2),
-      Constraint::Percentage(percent_y),
-      Constraint::Percentage((100 - percent_y) / 2),
-    ])
-    .split(r);
-
-  Layout::default()
-    .direction(Direction::Horizontal)
-    .constraints([
-      Constraint::Percentage((100 - percent_x) / 2),
-      Constraint::Percentage(percent_x),
-      Constraint::Percentage((100 - percent_x) / 2),
-    ])
-    .split(popup_layout[1])[1]
 }
