@@ -1,26 +1,13 @@
 use color_eyre::Result;
-use crossterm::event::{self, Event};
-use ratatui::{DefaultTerminal, Frame};
+use rit::tui::app::App;
 
 fn main() -> Result<()> {
   color_eyre::install()?;
 
-  let terminal = ratatui::init();
-  let result   = run(terminal);
+  let mut terminal = ratatui::init();
+  let mut app = App::new();
+  let result = app.run(&mut terminal);
 
   ratatui::restore();
-  return result
-}
-
-fn run(mut terminal: DefaultTerminal) -> Result<()> {
-  loop {
-    terminal.draw(render)?;
-    if matches!(event::read()?, Event::Key(_)) {
-      break Ok(());
-    }
-  }
-}
-
-fn render(frame: &mut Frame) {
-  frame.render_widget("hello world", frame.area());
+  return result;
 }
