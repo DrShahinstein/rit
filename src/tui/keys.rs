@@ -1,5 +1,5 @@
 use crossterm::event::KeyCode;
-use super::app::App;
+use super::App;
 
 impl App {
   pub(super) fn handle_keys(&mut self, key: KeyCode) {
