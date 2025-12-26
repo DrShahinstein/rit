@@ -6,14 +6,20 @@ use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 use super::ui;
 
+pub enum RenderChoice {
+  MainMenu, CommitMenu,
+}
+
 pub struct App {
-  exit: bool,
+  pub render_choice: RenderChoice,
+  exit:              bool,
 }
 
 impl App {
   pub fn new() -> Self {
     Self {
-      exit: false,
+      render_choice: RenderChoice::MainMenu,
+      exit:          false,
     }
   }
 
