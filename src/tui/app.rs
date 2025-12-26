@@ -3,13 +3,14 @@ use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 use super::{ui, keys};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RenderChoice {
   MainMenu, CommitMenu,
 }
 
 pub struct App {
-  pub render_choice: RenderChoice,
-  exit:              bool,
+  render_choice: RenderChoice,
+  exit:          bool,
 }
 
 impl App {
@@ -31,6 +32,10 @@ impl App {
     }
     Ok(())
   }
+
+  pub fn get_render_choice(&self) -> RenderChoice { return self.render_choice;                     }
+  pub fn go_main(&mut self)                       { self.render_choice = RenderChoice::MainMenu;   }
+  pub fn go_commit(&mut self)                     { self.render_choice = RenderChoice::CommitMenu; }
 
   fn draw(&self, frame: &mut Frame) {
     ui::draw(self, frame);
