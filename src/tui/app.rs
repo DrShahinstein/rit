@@ -1,9 +1,12 @@
+#[path = "keys.rs"]
+mod keys;
+
 use color_eyre::Result;
 use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 
 pub struct App {
-  pub exit: bool,
+  exit: bool,
 }
 
 impl App {
