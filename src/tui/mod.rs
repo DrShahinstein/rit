@@ -1,3 +1,4 @@
 pub mod app;
-mod git;
+mod keys; 
 mod ui;
+mod git;
