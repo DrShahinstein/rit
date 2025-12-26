@@ -1,11 +1,9 @@
 use crossterm::event::KeyCode;
-use super::App;
+use super::app::App;
 
-impl App {
-  pub(super) fn handle_keys(&mut self, key: KeyCode) {
-    match key {
-      KeyCode::Char('q') | KeyCode::Esc => self.exit = true,
-      _ => {}
-    }
+pub fn handle_keys(app: &mut App, key: KeyCode) {
+  match key {
+    KeyCode::Char('q') | KeyCode::Esc => app.shutdown(),
+    _ => {}
   }
 }
