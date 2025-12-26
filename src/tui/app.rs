@@ -1,9 +1,9 @@
 use color_eyre::Result;
-use crossterm::event::{self, Event, KeyCode, KeyEventKind};
+use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 
 pub struct App {
-  exit: bool,
+  pub exit: bool,
 }
 
 impl App {
@@ -28,16 +28,9 @@ impl App {
   fn handle_events(&mut self) -> Result<()> {
     if let Event::Key(key) = event::read()? {
       if key.kind == KeyEventKind::Press {
-        self.handle_keys(key.code);
+        self.handle_keys(key.code); // keys.rs
       }
     }
     Ok(())
-  }
-
-  fn handle_keys(&mut self, key: KeyCode) {
-    match key {
-      KeyCode::Char('q') | KeyCode::Esc => self.exit = true,
-      _ => {}
-    }
   }
 }
