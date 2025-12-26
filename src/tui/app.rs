@@ -4,6 +4,7 @@ mod keys;
 use color_eyre::Result;
 use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
+use super::ui;
 
 pub struct App {
   exit: bool,
@@ -25,7 +26,7 @@ impl App {
   }
 
   fn draw(&self, frame: &mut Frame) {
-    frame.render_widget("Hello World", frame.area());
+    ui::draw(self, frame);
   }
 
   fn handle_events(&mut self) -> Result<()> {
