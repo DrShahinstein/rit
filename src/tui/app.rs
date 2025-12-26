@@ -3,14 +3,12 @@ use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 
 pub struct App {
-  message: String,
   exit: bool,
 }
 
 impl App {
   pub fn new() -> Self {
     Self {
-      message: String::from("HELLOEĞEĞEĞEĞEE"),
       exit: false,
     }
   }
@@ -24,17 +22,22 @@ impl App {
   }
 
   fn draw(&self, frame: &mut Frame) {
-    frame.render_widget(self.message.as_str(), frame.area());
+    frame.render_widget("Hello World", frame.area());
   }
 
   fn handle_events(&mut self) -> Result<()> {
     if let Event::Key(key) = event::read()? {
       if key.kind == KeyEventKind::Press {
-        match key.code {
-          KeyCode::Char('q') | KeyCode::Esc => self.exit = true, _ => {}
-        }
+        self.handle_keys(key.code);
       }
     }
     Ok(())
+  }
+
+  fn handle_keys(&mut self, key: KeyCode) {
+    match key {
+      KeyCode::Char('q') | KeyCode::Esc => self.exit = true,
+      _ => {}
+    }
   }
 }
