@@ -1,7 +1,7 @@
 use color_eyre::Result;
 use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
-use super::{ui, keys};
+use super::{ui, keys, git};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RenderChoice {
@@ -10,6 +10,7 @@ pub enum RenderChoice {
 
 pub struct App {
   render_choice: RenderChoice,
+  branch:        String,
   exit:          bool,
 }
 
@@ -17,6 +18,7 @@ impl Default for App {
   fn default() -> Self {
     App {
       render_choice: RenderChoice::MainMenu,
+      branch:        "unknown".to_string(),
       exit:          false,
     }
   }
@@ -25,6 +27,7 @@ impl Default for App {
 impl App {
   pub fn new() -> Self {
     Self {
+      branch: git::get_branch().unwrap_or_default(), 
       ..Default::default()
     }
   }
@@ -41,9 +44,14 @@ impl App {
     Ok(())
   }
 
+  /* render_choice */
   pub fn get_render_choice(&self) -> RenderChoice { return self.render_choice;                     }
   pub fn go_main(&mut self)                       { self.render_choice = RenderChoice::MainMenu;   }
   pub fn go_commit(&mut self)                     { self.render_choice = RenderChoice::CommitMenu; }
+
+  /* branch */
+  pub fn get_branch(&self) -> String    { return self.branch.clone(); }
+  pub fn set_branch(&mut self, b: &str) { self.branch = b.to_string(); }
 
   fn draw(&self, frame: &mut Frame) {
     ui::draw(self, frame);
