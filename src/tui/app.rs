@@ -13,11 +13,19 @@ pub struct App {
   exit:          bool,
 }
 
+impl Default for App {
+  fn default() -> Self {
+    App {
+      render_choice: RenderChoice::MainMenu,
+      exit:          false,
+    }
+  }
+}
+
 impl App {
   pub fn new() -> Self {
     Self {
-      render_choice: RenderChoice::MainMenu,
-      exit:          false,
+      ..Default::default()
     }
   }
 
