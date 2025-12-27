@@ -13,3 +13,11 @@ pub fn run(commands: &[&str]) -> Result<String, String> {
     Err(String::from_utf8_lossy(&output.stderr).into())
   }
 }
+
+pub fn get_branch() -> Option<String> {
+  run(&["branch", "--show-current"])
+    .ok()
+    .map(|s| s.trim().to_string())
+    .filter(|s| !s.is_empty())
+}
+
