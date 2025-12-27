@@ -8,7 +8,7 @@ pub fn draw(app: &App, frame: &mut Frame) {
     .constraints([Constraint::Length(1), Constraint::Min(0)])
     .split(frame.area());
 
-  let branch = app.get_branch();
+  let branch = format!("branch: {}", app.get_branch());
   let style  = Style::default().fg(Color::Green);
 
   let header = Paragraph::new(branch)
