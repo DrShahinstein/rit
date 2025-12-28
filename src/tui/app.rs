@@ -18,7 +18,7 @@ impl Default for App {
   fn default() -> Self {
     App {
       render_choice: RenderChoice::MainMenu,
-      branch:        "unknown".to_string(),
+      branch:        String::new(),
       exit:          false,
     }
   }
@@ -26,10 +26,7 @@ impl Default for App {
 
 impl App {
   pub fn new() -> Self {
-    Self {
-      branch: git::get_branch().unwrap_or_default(), 
-      ..Default::default()
-    }
+    Self::default()
   }
 
   pub fn shutdown(&mut self) {
@@ -37,11 +34,17 @@ impl App {
   }
 
   pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
+    self.init();
+
     while !self.exit {
       terminal.draw(|frame| ui::render(self, frame))?;
       self.handle_events()?;
     }
     Ok(())
+  }
+
+  fn init(&mut self) {
+    self.branch = git::get_branch().unwrap_or_else(|| "unknown".to_string());
   }
 
   fn handle_events(&mut self) -> Result<()> {
