@@ -38,14 +38,10 @@ impl App {
 
   pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
     while !self.exit {
-      terminal.draw(|frame| self.draw(frame))?;
+      terminal.draw(|frame| ui::render(self, frame))?;
       self.handle_events()?;
     }
     Ok(())
-  }
- 
-  fn draw(&self, frame: &mut Frame) {
-    ui::draw(self, frame);
   }
 
   fn handle_events(&mut self) -> Result<()> {
