@@ -2,7 +2,7 @@
 use ratatui::{prelude::{*}, widgets::{*}};
 use super::app::{App, RenderChoice};
 
-pub fn draw(app: &App, frame: &mut Frame) {
+pub fn render(app: &App, frame: &mut Frame) {
   let chunks =  Layout::default()
     .direction(Direction::Vertical)
     .constraints([Constraint::Length(1), Constraint::Min(0)])
