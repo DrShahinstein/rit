@@ -70,14 +70,14 @@ impl App {
   pub fn go_commit(&mut self)                     { self.render_choice = RenderChoice::CommitMenu; }
 
   /* branch */
-  pub fn get_branch(&self) -> String    { self.branch.clone()          }
+  pub fn get_branch(&self) -> &str      { &self.branch                 }
   pub fn set_branch(&mut self, b: &str) { self.branch = b.to_string(); }
 
   /* last_error */
-  pub fn get_last_error(&self) -> String {
+  pub fn get_last_error(&self) -> &str {
     match &self.last_error {
-      Some(msg) => msg.to_string(),
-      None      => String::new(),
+      Some(msg) => msg,
+      None      => "",
     }
   }
 }
