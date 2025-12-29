@@ -1,7 +1,6 @@
 use std::process::Command;
 use color_eyre::{Result, eyre::bail};
 
-#[allow(dead_code)]
 pub mod file {
   #[derive(Debug, Clone, Copy, PartialEq, Eq)]
   pub enum Status {
@@ -14,6 +13,22 @@ pub mod file {
     Untracked, // '?'
   }
 
+  impl Status {
+    pub fn from_char(c: char) -> Self {
+      match c {
+        'M' => Self::Modified,
+        'A' => Self::Added,
+        'D' => Self::Deleted,
+        'R' => Self::Renamed,
+        'C' => Self::Copied,
+        'U' => Self::Unmerged,
+        '?' => Self::Untracked,
+         _  => Self::Untracked,
+      }
+    }
+  }
+
+  #[allow(dead_code)]
   #[derive(Debug, Clone)]
   pub struct Changed {
     pub path:   String,
@@ -36,7 +51,40 @@ pub fn get_branch() -> Result<String> {
     .map(|s| s.trim().to_string())
 }
 
-pub fn _get_changed_files() -> Result<Vec<file::Changed>> {
-  let _gitstatus = run(&["status", "--porcelain=v1"])?;
-  Ok(Vec::new())
+pub fn get_changed_files() -> Result<Vec<file::Changed>> {
+  let mut changed_files = Vec::new();
+  let gitstatus         = run(&["status", "--porcelain=v1"])?;
+
+  for line in gitstatus.trim().lines() {
+    let s: Vec<&str> = line.split_whitespace().collect();
+
+    let path   = s[1].to_string();
+    let status = file::Status::from_char(
+      s[0]
+       .chars()
+       .next()
+       .unwrap()
+    );
+
+    if s.len() >= 2 {
+      changed_files.push(
+        file::Changed {
+          status, 
+          path,
+        }
+      );
+    }
+  }
+
+
+  Ok(changed_files)
 }
+
+/*
+ *
+ * pub fn get_changed_files()...
+ * `gitstatus` gives something like
+ * "M src/tui/app.rs"
+ * "M src/tui/git.rs"
+ *
+ */
