@@ -1,7 +1,7 @@
 use color_eyre::Result;
 use crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal};
-use super::{ui, keys, git};
+use super::{ui, keys, git, git::file};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RenderChoice {
@@ -11,6 +11,7 @@ pub enum RenderChoice {
 pub struct App {
   render_choice: RenderChoice,
   branch:        String,
+  changed_files: Vec<file::Changed>,
   last_error:    Option<String>,
   exit:          bool,
 }
@@ -20,6 +21,7 @@ impl Default for App {
     App {
       render_choice: RenderChoice::MainMenu,
       branch:        String::new(),
+      changed_files: Vec::new(),
       last_error:    None,
       exit:          false,
     }
@@ -39,6 +41,14 @@ impl App {
         "unknown".to_string()
       },
     };
+
+    self.changed_files = match git::get_changed_files() {
+      Ok(v)  => v,
+      Err(e) => {
+        self.last_error = Some(e.to_string());
+        Vec::new()
+      },
+    }
   }
 
   fn handle_events(&mut self) -> Result<()> {
