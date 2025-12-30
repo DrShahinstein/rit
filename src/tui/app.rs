@@ -83,6 +83,9 @@ impl App {
   pub fn get_branch(&self) -> &str      { &self.branch                 }
   pub fn set_branch(&mut self, b: &str) { self.branch = b.to_string(); }
 
+  /* changed_files */
+  pub fn get_changed_files(&self) -> &[file::Changed] { &self.changed_files }
+
   /* last_error */
   pub fn get_last_error(&self) -> &str {
     match &self.last_error {
