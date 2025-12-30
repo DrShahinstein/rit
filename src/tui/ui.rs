@@ -9,20 +9,34 @@ pub fn render(app: &App, frame: &mut Frame) {
     .split(frame.area());
 
   let branch = format!("branch: {}", app.get_branch());
-  let style  = Style::default().fg(Color::Green);
-
   let header = Paragraph::new(branch)
     .alignment(Alignment::Center)
-    .style(style);
+    .style(Style::default().fg(Color::Green));
 
   frame.render_widget(header, chunks[0]);
 
   match app.get_render_choice() {
-    RenderChoice::MainMenu => {
-      frame.render_widget("Main", chunks[1]);
-    }
-    RenderChoice::CommitMenu => {
-      frame.render_widget("Commit", chunks[1]);
-    }
+    RenderChoice::MainMenu   => main_menu(&app,   frame, chunks[1]),
+    RenderChoice::CommitMenu => commit_menu(&app, frame, chunks[1]),
   }
+}
+
+fn main_menu(app: &App, frame: &mut Frame, area: Rect) {
+  let files: Vec<ListItem> = app
+    .get_changed_files()
+    .iter()
+    .map(|f| {
+      let line = format!("{:?} {}", f.status, f.path);
+      ListItem::new(line)
+    })
+    .collect();
+
+  let list = List::new(files)
+    .block(Block::default().title("Changes").borders(Borders::ALL));
+
+  frame.render_widget(list, area);
+}
+
+fn commit_menu(_app: &App, frame: &mut Frame, area: Rect) {
+  frame.render_widget("Commit", area);
 }
