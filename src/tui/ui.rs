@@ -26,7 +26,8 @@ fn main_menu(app: &App, frame: &mut Frame, area: Rect) {
     .get_changed_files()
     .iter()
     .map(|f| {
-      let line = format!("{:?} {}", f.status, f.path);
+                       // XY <path>
+      let line = format!("{}{} {}", f.index.as_char(), f.worktree.as_char(), f.path);
       ListItem::new(line)
     })
     .collect();
