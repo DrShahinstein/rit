@@ -4,18 +4,21 @@ use color_eyre::{Result, eyre::bail};
 pub mod file {
   #[derive(Debug, Clone, Copy, PartialEq, Eq)]
   pub enum Status {
-    Modified,  // 'M'
-    Added,     // 'A'
-    Deleted,   // 'D'
-    Renamed,   // 'R'
-    Copied,    // 'C'
-    Unmerged,  // 'U'
-    Untracked, // '?'
+    Unmodified, // ' '
+    Modified,   // 'M'
+    Added,      // 'A'
+    Deleted,    // 'D'
+    Renamed,    // 'R'
+    Copied,     // 'C'
+    Unmerged,   // 'U'
+    Untracked,  // '?'
+    Other(char),
   }
 
   impl Status {
     pub fn from_char(c: char) -> Self {
       match c {
+        ' ' => Self::Unmodified,
         'M' => Self::Modified,
         'A' => Self::Added,
         'D' => Self::Deleted,
@@ -23,16 +26,34 @@ pub mod file {
         'C' => Self::Copied,
         'U' => Self::Unmerged,
         '?' => Self::Untracked,
-         _  => Self::Untracked,
+         c  => Self::Other(c),
+      }
+    }
+    pub fn as_char(self) -> char {
+      match self {
+        Self::Unmodified => ' ',
+        Self::Modified   => 'M',
+        Self::Added      => 'A',
+        Self::Deleted    => 'D',
+        Self::Renamed    => 'R',
+        Self::Copied     => 'C',
+        Self::Unmerged   => 'U',
+        Self::Untracked  => '?',
+        Self::Other(c)   => c,
       }
     }
   }
 
-  #[allow(dead_code)]
-  #[derive(Debug, Clone)]
+  #[derive(Debug, Clone, PartialEq, Eq)]
   pub struct Changed {
-    pub path:   String,
-    pub status: Status,
+    pub path:     String,
+    pub index:    Status, // X
+    pub worktree: Status, // Y
+  }
+
+  impl Changed {
+    pub fn is_staged(&self) -> bool { self.index    != Status::Unmodified && self.index    != Status::Untracked }
+    pub fn is_dirty(&self)  -> bool { self.worktree != Status::Unmodified && self.worktree != Status::Untracked }
   }
 }
 
@@ -55,27 +76,25 @@ pub fn get_changed_files() -> Result<Vec<file::Changed>> {
   let mut changed_files = Vec::new();
   let gitstatus         = run(&["status", "--porcelain=v1"])?;
 
-  for line in gitstatus.trim().lines() {
-    let s: Vec<&str> = line.split_whitespace().collect();
+  for line in gitstatus.lines() {
+    if line.is_empty() || line.len() < 4 { continue; }
 
-    let path   = s[1].to_string();
-    let status = file::Status::from_char(
-      s[0]
-       .chars()
-       .next()
-       .unwrap()
-    );
+    let x = line.chars().nth(0).unwrap();
+    let y = line.chars().nth(1).unwrap();
 
-    if s.len() >= 2 {
-      changed_files.push(
-        file::Changed {
-          status, 
-          path,
-        }
-      );
-    }
+    let raw_path = line[3..].trim();
+    let path     = if let Some((_, new_path)) = raw_path.split_once(" -> ") {
+      new_path.trim()
+    } else {
+      raw_path
+    };
+
+    changed_files.push(file::Changed {
+      path:     path.to_string(),
+      index:    file::Status::from_char(x),
+      worktree: file::Status::from_char(y),
+    });
   }
-
 
   Ok(changed_files)
 }
@@ -84,7 +103,15 @@ pub fn get_changed_files() -> Result<Vec<file::Changed>> {
  *
  * pub fn get_changed_files()...
  * `gitstatus` gives something like
- * "M src/tui/app.rs"
- * "M src/tui/git.rs"
+ *   "M src/tui/app.rs"
+ *   "M src/tui/git.rs"
+ * 
+ * could be formulized as
+ *   "XY <path>"
+ *
+ *   X: git index
+ *   Y: git worktree
+ *   
+ *   see "git index vs worktree"
  *
  */
