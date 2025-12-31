@@ -3,7 +3,7 @@ use super::app::{App, RenderChoice};
 
 pub fn handle_keys(app: &mut App, key: KeyCode) {
   match key {
-    KeyCode::Char('q') => app.shutdown(),
+    KeyCode::Char('q') => { app.shutdown(); return; },
     _ => {}
   }
 
@@ -16,6 +16,8 @@ pub fn handle_keys(app: &mut App, key: KeyCode) {
 fn main_menu_keys(app: &mut App, key: KeyCode) {
   match key {
     KeyCode::Char('c') => app.go_commit(),
+    KeyCode::Down      => app.select_next(),
+    KeyCode::Up        => app.select_prev(),
     _ => {}
   }
 }
