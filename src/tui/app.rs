@@ -1,6 +1,6 @@
 use color_eyre::Result;
 use crossterm::event::{self, Event, KeyEventKind};
-use ratatui::{DefaultTerminal};
+use ratatui::{DefaultTerminal, widgets::ListState};
 use super::{ui, keys, git, git::file};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,6 +12,7 @@ pub struct App {
   render_choice: RenderChoice,
   branch:        String,
   changed_files: Vec<file::Changed>,
+  listview:      ListState,
   last_error:    Option<String>,
   exit:          bool,
 }
@@ -22,6 +23,7 @@ impl Default for App {
       render_choice: RenderChoice::MainMenu,
       branch:        String::new(),
       changed_files: Vec::new(),
+      listview:      ListState::default(),
       last_error:    None,
       exit:          false,
     }
@@ -48,6 +50,12 @@ impl App {
         self.last_error = Some(e.to_string());
         Vec::new()
       },
+    };
+    
+    if self.changed_files.is_empty() {
+      self.listview.select(None);
+    } else {
+      self.listview.select(Some(0));
     }
   }
 
@@ -85,6 +93,10 @@ impl App {
 
   /* changed_files */
   pub fn get_changed_files(&self) -> &[file::Changed] { &self.changed_files }
+
+  /* listview */
+  pub fn get_listview(&self)         -> &ListState     { &self.listview     }
+  pub fn get_listview_mut(&mut self) -> &mut ListState { &mut self.listview }
 
   /* last_error */
   pub fn get_last_error(&self) -> &str {
