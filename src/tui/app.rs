@@ -97,6 +97,30 @@ impl App {
   /* listview */
   pub fn get_listview(&self)         -> &ListState     { &self.listview     }
   pub fn get_listview_mut(&mut self) -> &mut ListState { &mut self.listview }
+  pub fn select_next(&mut self) {
+    let len = self.changed_files.len();
+    if len == 0 {
+      self.listview.select(None);
+      return;
+    }
+
+    let i    = self.listview.selected().unwrap_or(0);
+    let next = if i + 1 >= len {0} else {i+1};
+
+    self.listview.select(Some(next));
+  }
+  pub fn select_prev(&mut self) {
+    let len = self.changed_files.len();
+    if len == 0 {
+      self.listview.select(None);
+      return;
+    }
+
+    let i    = self.listview.selected().unwrap_or(0);
+    let prev = if i == 0 {len-1} else {i-1};
+
+    self.listview.select(Some(prev));
+  }
 
   /* last_error */
   pub fn get_last_error(&self) -> &str {
