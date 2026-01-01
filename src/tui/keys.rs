@@ -19,6 +19,7 @@ fn main_menu_keys(app: &mut App, key: KeyCode) {
     KeyCode::Char('r') => app.refresh(),
     KeyCode::Down      => app.select_next(),
     KeyCode::Up        => app.select_prev(),
+    KeyCode::Enter     => app.toggle_file_stage(),
     _ => {}
   }
 }
