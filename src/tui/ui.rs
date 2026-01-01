@@ -1,6 +1,6 @@
 #[allow(unused_imports)]
 use ratatui::{prelude::{*}, widgets::{*}, style::{*}};
-use super::app::{App, RenderChoice};
+use super::{app::App, app::RenderChoice, git::file};
 
 pub fn render(app: &mut App, frame: &mut Frame) {
   let err = app.get_last_error();
@@ -37,7 +37,7 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
   let files: Vec<ListItem> = app
     .get_changed_files()
     .iter()
-    .map(|f| {
+    .map(|f: &file::Changed| {
       let checked  = f.is_staged();
       let checkbox = help::checkbox(checked);
       let path     = f.path.clone();
