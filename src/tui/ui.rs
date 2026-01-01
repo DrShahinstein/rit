@@ -38,8 +38,7 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
     .get_changed_files()
     .iter()
     .map(|f| {
-      let checked = false;
-
+      let checked  = f.is_staged();
       let checkbox = help::checkbox(checked);
       let path     = f.path.clone();
       let worktree = f.worktree.as_char();
