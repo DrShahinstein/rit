@@ -35,7 +35,7 @@ impl App {
     Self::default()
   }
 
-  pub fn refresh(&mut self) {
+  fn init(&mut self) {
     self.branch = match git::get_branch() {
       Ok(b)  => b,
       Err(e) => {
@@ -54,8 +54,17 @@ impl App {
     
     if self.changed_files.is_empty() {
       self.listview.select(None);
-    } else {
+    } else if self.listview.selected().is_none() {
       self.listview.select(Some(0));
+    } else {
+      let len = self.changed_files.len();
+
+      let already = match len {
+        0 => None,
+        _ => Some(self.listview.selected().unwrap_or(0).min(len - 1)),
+      };
+
+      self.listview.select(already);
     }
   }
 
@@ -78,8 +87,28 @@ impl App {
     Ok(())
   }
 
-  pub fn shutdown(&mut self) {
-    self.exit = true;
+  pub fn shutdown(&mut self) { self.exit = true; }
+  pub fn refresh(&mut self)  { self.init();      }
+ 
+  pub fn toggle_file_stage(&mut self) {
+    let Some(i) = self.listview.selected()  else { return; };
+    let Some(f) = self.changed_files.get(i) else { return; };
+
+    let path   = &f.path;
+    let staged = f.is_staged();
+
+    let res = if staged {
+      git::unstage(path)
+    } else {
+      git::stage(path)
+    };
+
+    if let Err(e) = res {
+      self.last_error = Some(e.to_string());
+      return;
+    }
+
+    self.refresh();
   }
 
   /* render_choice */
