@@ -99,6 +99,14 @@ pub fn get_changed_files() -> Result<Vec<file::Changed>> {
   Ok(changed_files)
 }
 
+pub fn stage(path: &str) -> Result<()> {
+  run(&["add", "--", path]).map(|_| ())
+}
+
+pub fn unstage(path: &str) -> Result<()> {
+  run(&["restore", "--staged", "--", path]).map(|_| ())
+}
+
 /*
  *
  * pub fn get_changed_files()...
