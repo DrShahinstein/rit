@@ -35,7 +35,7 @@ impl App {
     Self::default()
   }
 
-  fn init(&mut self) {
+  fn refresh(&mut self) {
     self.branch = match git::get_branch() {
       Ok(b)  => b,
       Err(e) => {
@@ -69,7 +69,7 @@ impl App {
   }
 
   pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
-    self.init();
+    self.refresh();
 
     while !self.exit {
       terminal.draw(|frame| ui::render(self, frame))?;
