@@ -35,7 +35,7 @@ impl App {
     Self::default()
   }
 
-  fn refresh(&mut self) {
+  pub fn refresh(&mut self) {
     self.branch = match git::get_branch() {
       Ok(b)  => b,
       Err(e) => {
