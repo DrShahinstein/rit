@@ -44,13 +44,16 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
       let worktree = f.worktree.as_char();
       let index    = f.index.as_char();
 
+      let wt  = if index    == ' ' {'*'} else {index};
+      let idx = if worktree == ' ' {'*'} else {worktree};
+
       let line = Line::from(vec![
         Span::styled(checkbox, help::checkbox_color(checked)),
         Span::raw(" "),
         Span::raw(path),
         Span::raw(" "),
-        Span::styled(worktree.to_string(), help::colored(worktree)),
-        Span::styled(index.to_string(),    help::colored(index)),
+        Span::styled(wt.to_string(),  help::colored(wt)),
+        Span::styled(idx.to_string(), help::colored(idx)),
       ]);
 
       ListItem::new(line)
@@ -62,7 +65,7 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
     .highlight_style(
       Style::default()
         .bg(Color::DarkGray)
-        .add_modifier(Modifier::BOLD),)
+        .add_modifier(Modifier::BOLD))
     .highlight_symbol(">> ");
 
   frame.render_stateful_widget(list, area, app.get_listview_mut());
