@@ -38,22 +38,22 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
     .get_changed_files()
     .iter()
     .map(|f: &file::Changed| {
-      let checked  = f.is_staged();
-      let checkbox = help::checkbox(checked);
-      let path     = f.path.clone();
-      let worktree = f.worktree.as_char();
-      let index    = f.index.as_char();
+      let checked      = f.is_staged();
+      let checkbox     = help::checkbox(checked);
+      let path         = f.path.clone();
+      let mut index    = f.index.as_char();
+      let mut worktree = f.worktree.as_char();
 
-      let wt  = if index    == ' ' {'*'} else {index};
-      let idx = if worktree == ' ' {'*'} else {worktree};
+      if index    == ' ' { index='*';    };
+      if worktree == ' ' { worktree='*'; };
 
       let line = Line::from(vec![
         Span::styled(checkbox, help::checkbox_color(checked)),
         Span::raw(" "),
         Span::raw(path),
         Span::raw(" "),
-        Span::styled(wt.to_string(),  help::colored(wt)),
-        Span::styled(idx.to_string(), help::colored(idx)),
+        Span::styled(index.to_string(),    help::colored(index)),
+        Span::styled(worktree.to_string(), help::colored(worktree)),
       ]);
 
       ListItem::new(line)
