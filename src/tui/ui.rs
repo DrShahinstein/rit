@@ -71,8 +71,10 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
   frame.render_stateful_widget(list, area, app.get_listview_mut());
 }
 
-fn commit_menu(_app: &mut App, frame: &mut Frame, area: Rect) {
-  frame.render_widget("Commit", area);
+fn commit_menu(app: &mut App, frame: &mut Frame, area: Rect) {
+  main_menu(app, frame, area);
+
+  frame.render_widget(app.get_textarea(), area);
 }
 
 
