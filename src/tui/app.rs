@@ -117,7 +117,11 @@ impl App {
   /* render_choice */
   pub fn get_render_choice(&self) -> RenderChoice { self.render_choice                             }
   pub fn go_main(&mut self)                       { self.render_choice = RenderChoice::MainMenu;   }
-  pub fn go_commit(&mut self)                     { self.render_choice = RenderChoice::CommitMenu; }
+  pub fn go_commit(&mut self) {
+    let any_staged = self.changed_files.iter().any(|f| f.is_staged());
+    if !any_staged { return; };
+    self.render_choice = RenderChoice::CommitMenu;
+  }
 
   /* branch */
   pub fn get_branch(&self) -> &str      { &self.branch                 }
