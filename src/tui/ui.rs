@@ -26,7 +26,8 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     RenderChoice::CommitMenu => commit_menu(app, frame, layout[1]),
   }
 
-  let footer = Paragraph::new("q: quit    c: commit    r: refresh")
+  let help_keys = help::keys_for(app.get_render_choice());
+  let footer    = Paragraph::new(help_keys)
     .alignment(Alignment::Center)
     .style(Style::default().fg(Color::LightBlue));
 
@@ -87,6 +88,7 @@ fn commit_menu(app: &mut App, frame: &mut Frame, area: Rect) {
 mod help {
   #[allow(unused_imports)]
   use ratatui::{prelude::{*}, widgets::{*}, style::{*}};
+  use super::RenderChoice;
   use tui_textarea::TextArea;
 
   pub fn render_error(msg: &str, frame: &mut Frame) {
@@ -139,6 +141,13 @@ mod help {
     }
   }
 
+  pub fn keys_for(choice: RenderChoice) -> &'static str {
+    match choice {
+      RenderChoice::MainMenu   => "q: quit    c: commit    r: refresh",
+      RenderChoice::CommitMenu => "esc: back    enter: commit",
+    }
+  }
+
   pub fn customize_textarea(t: &mut TextArea) {
     let border   = Style::default().fg(Color::LightMagenta);
 
@@ -152,6 +161,7 @@ mod help {
     );
   }
 
+  /* for textarea */
   pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
     let vert = Layout::default()
       .direction(Direction::Vertical)
