@@ -1,4 +1,5 @@
-use std::process::Command;
+use std::process::{Command, Stdio};
+use std::io::Write;
 use color_eyre::{Result, eyre::bail};
 
 pub mod file {
@@ -100,11 +101,32 @@ pub fn get_changed_files() -> Result<Vec<file::Changed>> {
 }
 
 pub fn stage(path: &str) -> Result<()> {
-  run(&["add", "--", path]).map(|_| ())
+  run(&["add", path]).map(|_| ())
 }
 
 pub fn unstage(path: &str) -> Result<()> {
-  run(&["restore", "--staged", "--", path]).map(|_| ())
+  run(&["restore", "--staged", path]).map(|_| ())
+}
+
+pub fn commit(message: &str) -> Result<()> {
+  let mut child = Command::new("git")
+    .args(&["commit", "-F", "-"])
+    .stdin(Stdio::piped())
+    .stdout(Stdio::piped())
+    .stderr(Stdio::piped())
+    .spawn()?;
+
+  if let Some(mut stdin) = child.stdin.take() {
+    stdin.write_all(message.as_bytes())?;
+  }
+
+  let output = child.wait_with_output()?;
+
+  if output.status.success() {
+    Ok(())
+  } else {
+    bail!("{}", String::from_utf8_lossy(&output.stderr))
+  }
 }
 
 /*
