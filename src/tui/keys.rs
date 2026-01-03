@@ -1,4 +1,4 @@
-use ratatui::crossterm::event::{KeyEvent, KeyCode};
+use ratatui::crossterm::event::{KeyEvent, KeyCode, KeyModifiers};
 use super::app::{App, RenderChoice};
 
 pub fn handle_keys(app: &mut App, key: KeyEvent) {
@@ -23,6 +23,12 @@ fn main_menu_keys(app: &mut App, key: KeyEvent) {
 fn commit_menu_keys(app: &mut App, key: KeyEvent) {
   match key.code {
     KeyCode::Esc => { app.go_main(); return; },
+
+    /* commit on ctrl+s */
+    KeyCode::Char('s') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+      app.commit();
+      return;
+    }
     _ => {}
   }
 
