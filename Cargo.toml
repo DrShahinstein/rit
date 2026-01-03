@@ -1,7 +1,13 @@
 [package]
-name    = "rit"
-version = "0.1.0"
-edition = "2024"
+name        = "rit-tui"
+version     = "0.1.0"
+edition     = "2024"
+authors     = ["DrShahinstein <1taylanozturk@protonmail.com>"]
+description = "A tiny git manager I made for myself"
+repository  = "https://github.com/DrShahinstein/rit"
+readme      = "README.md"
+keywords    = ["git", "tui", "terminal"]
+categories  = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 color-eyre   = "0.6.5"
