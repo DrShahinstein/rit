@@ -1,32 +1,30 @@
-use crossterm::event::KeyCode;
+use ratatui::crossterm::event::{KeyEvent, KeyCode};
 use super::app::{App, RenderChoice};
 
-pub fn handle_keys(app: &mut App, key: KeyCode) {
-  match key {
-    KeyCode::Char('q') => { app.shutdown(); return; },
-    _ => {}
-  }
-
+pub fn handle_keys(app: &mut App, key: KeyEvent) {
   match app.get_render_choice() {
     RenderChoice::MainMenu   => main_menu_keys(app, key),
     RenderChoice::CommitMenu => commit_menu_keys(app, key),
   }
 }
 
-fn main_menu_keys(app: &mut App, key: KeyCode) {
-  match key {
-    KeyCode::Char('c') => app.go_commit(),
-    KeyCode::Char('r') => app.refresh(),
-    KeyCode::Down      => app.select_next(),
-    KeyCode::Up        => app.select_prev(),
-    KeyCode::Enter     => app.toggle_file_stage(),
+fn main_menu_keys(app: &mut App, key: KeyEvent) {
+  match key.code {
+    KeyCode::Char('q') => { app.shutdown(); return; },
+    KeyCode::Char('c') =>   app.go_commit(),
+    KeyCode::Char('r') =>   app.refresh(),
+    KeyCode::Down      =>   app.select_next(),
+    KeyCode::Up        =>   app.select_prev(),
+    KeyCode::Enter     =>   app.toggle_file_stage(),
     _ => {}
   }
 }
 
-fn commit_menu_keys(app: &mut App, key: KeyCode) {
-  match key {
-    KeyCode::Esc => app.go_main(),
+fn commit_menu_keys(app: &mut App, key: KeyEvent) {
+  match key.code {
+    KeyCode::Esc => { app.go_main(); return; },
     _ => {}
   }
+
+  app.get_textarea_mut().input(key);
 }
