@@ -526,7 +526,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "rit"
+name = "rit-tui"
 version = "0.1.0"
 dependencies = [
  "color-eyre",
