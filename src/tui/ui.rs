@@ -144,7 +144,7 @@ mod help {
   pub fn keys_for(choice: RenderChoice) -> &'static str {
     match choice {
       RenderChoice::MainMenu   => "q: quit    c: commit    r: refresh",
-      RenderChoice::CommitMenu => "esc: back    enter: commit",
+      RenderChoice::CommitMenu => "esc: back   commit: ctrl+s   next-line: enter",
     }
   }
 
