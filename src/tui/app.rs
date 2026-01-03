@@ -1,6 +1,7 @@
 use color_eyre::Result;
-use crossterm::event::{self, Event, KeyEventKind};
+use ratatui::crossterm::event::{self, Event, KeyEventKind};
 use ratatui::{DefaultTerminal, widgets::ListState};
+use tui_textarea::TextArea;
 use super::{ui, keys, git, git::file};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -13,6 +14,7 @@ pub struct App {
   branch:        String,
   changed_files: Vec<file::Changed>,
   listview:      ListState,
+  textarea:      TextArea<'static>,
   last_error:    Option<String>,
   exit:          bool,
 }
@@ -24,6 +26,7 @@ impl Default for App {
       branch:        String::new(),
       changed_files: Vec::new(),
       listview:      ListState::default(),
+      textarea:      TextArea::default(),
       last_error:    None,
       exit:          false,
     }
@@ -71,7 +74,7 @@ impl App {
   fn handle_events(&mut self) -> Result<()> {
     if let Event::Key(key) = event::read()? {
       if key.kind == KeyEventKind::Press {
-        keys::handle_keys(self, key.code);
+        keys::handle_keys(self, key);
       }
     }
     Ok(())
@@ -150,6 +153,10 @@ impl App {
 
     self.listview.select(Some(prev));
   }
+
+  /* textarea */
+  pub fn get_textarea(&self)         -> &TextArea<'static>     { &self.textarea     }
+  pub fn get_textarea_mut(&mut self) -> &mut TextArea<'static> { &mut self.textarea }
 
   /* last_error */
   pub fn get_last_error(&self) -> &str {
