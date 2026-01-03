@@ -74,13 +74,20 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
 fn commit_menu(app: &mut App, frame: &mut Frame, area: Rect) {
   main_menu(app, frame, area);
 
-  frame.render_widget(app.get_textarea(), area);
+  let popup = help::centered_rect(60, 20, frame.area());
+  frame.render_widget(Clear, popup);
+
+  let textarea = app.get_textarea_mut();
+  help::customize_textarea(textarea);
+
+  frame.render_widget(&*textarea, popup);
 }
 
 
 mod help {
   #[allow(unused_imports)]
   use ratatui::{prelude::{*}, widgets::{*}, style::{*}};
+  use tui_textarea::TextArea;
 
   pub fn render_error(msg: &str, frame: &mut Frame) {
     let layout = Layout::default()
@@ -130,5 +137,38 @@ mod help {
       ' ' => Style::default().fg(Color::DarkGray),
       _   => Style::default(),
     }
+  }
+
+  pub fn customize_textarea(t: &mut TextArea) {
+    let border   = Style::default().fg(Color::LightMagenta);
+
+    t.set_style(Style::default().fg(Color::White));
+    t.set_cursor_line_style(Style::default());
+    t.set_block(
+      Block::default()
+        .borders(Borders::ALL)
+        .border_style(border)
+        .title(Span::styled("Commit Message", border.add_modifier(Modifier::BOLD))),
+    );
+  }
+
+  pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    let vert = Layout::default()
+      .direction(Direction::Vertical)
+      .constraints([
+        Constraint::Percentage((100 - percent_y) / 2),
+        Constraint::Percentage(percent_y),
+        Constraint::Percentage((100 - percent_y) / 2),
+      ])
+      .split(r);
+
+    Layout::default()
+      .direction(Direction::Horizontal)
+      .constraints([
+        Constraint::Percentage((100 - percent_x) / 2),
+        Constraint::Percentage(percent_x),
+        Constraint::Percentage((100 - percent_x) / 2),
+      ])
+      .split(vert[1])[1]
   }
 }
