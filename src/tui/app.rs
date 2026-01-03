@@ -161,6 +161,22 @@ impl App {
   /* textarea */
   pub fn get_textarea(&self)         -> &TextArea<'static>     { &self.textarea     }
   pub fn get_textarea_mut(&mut self) -> &mut TextArea<'static> { &mut self.textarea }
+  pub fn commit(&mut self) {
+    let msg = self.textarea.lines().join("\n");
+
+    if msg.trim().is_empty() {
+      return;
+    }
+
+    if let Err(e) = git::commit(&msg) {
+      self.last_error = Some(e.to_string());
+      return;
+    }
+
+    self.textarea = TextArea::default();
+    self.go_main();
+    self.refresh();
+  }
 
   /* last_error */
   pub fn get_last_error(&self) -> &str {
