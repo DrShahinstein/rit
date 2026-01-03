@@ -1,5 +1,5 @@
 use color_eyre::Result;
-use rit::tui::app::App;
+use rit_tui::tui::app::App;
 
 fn main() -> Result<()> {
   color_eyre::install()?;
