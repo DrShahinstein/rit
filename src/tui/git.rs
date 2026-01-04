@@ -1,5 +1,5 @@
 use std::process::{Command, Stdio};
-use std::io::Write;
+use std::{io::Write, env};
 use color_eyre::{Result, eyre::bail};
 
 pub mod file {
@@ -101,15 +101,22 @@ pub fn get_changed_files() -> Result<Vec<file::Changed>> {
 }
 
 pub fn stage(path: &str) -> Result<()> {
+  let root = get_git_root()?;
+  env::set_current_dir(&root)?;
   run(&["add", path]).map(|_| ())
 }
 
 pub fn unstage(path: &str) -> Result<()> {
+  let root = get_git_root()?;
+  env::set_current_dir(&root)?;
   run(&["restore", "--staged", path]).map(|_| ())
 }
 
 pub fn commit(message: &str) -> Result<()> {
+  let root = get_git_root()?;
+
   let mut child = Command::new("git")
+    .current_dir(&root)
     .args(&["commit", "-F", "-"])
     .stdin(Stdio::piped())
     .stdout(Stdio::piped())
@@ -127,6 +134,11 @@ pub fn commit(message: &str) -> Result<()> {
   } else {
     bail!("{}", String::from_utf8_lossy(&output.stderr))
   }
+}
+
+fn get_git_root() -> Result<String> {
+  run(&["rev-parse", "--show-toplevel"])
+    .map(|s| s.trim().to_string())
 }
 
 /*
