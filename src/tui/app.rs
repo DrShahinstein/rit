@@ -9,26 +9,34 @@ pub enum RenderChoice {
   MainMenu, CommitMenu,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SelectionMode {
+  Stage,
+  Discard,
+}
+
 pub struct App {
-  render_choice: RenderChoice,
-  branch:        String,
-  changed_files: Vec<file::Changed>,
-  listview:      ListState,
-  textarea:      TextArea<'static>,
-  last_error:    Option<String>,
-  exit:          bool,
+  render_choice:  RenderChoice,
+  branch:         String,
+  changed_files:  Vec<file::Changed>,
+  listview:       ListState,
+  selection_mode: SelectionMode,
+  textarea:       TextArea<'static>,
+  last_error:     Option<String>,
+  exit:           bool,
 }
 
 impl Default for App {
   fn default() -> Self {
     App {
-      render_choice: RenderChoice::MainMenu,
-      branch:        String::new(),
-      changed_files: Vec::new(),
-      listview:      ListState::default(),
-      textarea:      TextArea::default(),
-      last_error:    None,
-      exit:          false,
+      render_choice:  RenderChoice::MainMenu,
+      branch:         String::new(),
+      changed_files:  Vec::new(),
+      listview:       ListState::default(),
+      selection_mode: SelectionMode::Stage,
+      textarea:       TextArea::default(),
+      last_error:     None,
+      exit:           false,
     }
   }
 }
@@ -156,6 +164,29 @@ impl App {
     let prev = if i == 0 {len-1} else {i-1};
 
     self.listview.select(Some(prev));
+  }
+
+  /* selection_mode */
+  pub fn get_selection_mode(&self) -> SelectionMode { self.selection_mode }
+  pub fn toggle_selection_mode(&mut self) {
+    self.selection_mode = match self.selection_mode {
+      SelectionMode::Stage   => SelectionMode::Discard,
+      SelectionMode::Discard => SelectionMode::Stage,
+    }
+  }
+  pub fn discard_file(&mut self) {
+    let Some(i) = self.listview.selected()  else { return; };
+    let Some(f) = self.changed_files.get(i) else { return; };
+
+    let path = &f.path;
+    let res  = git::discard(path);
+
+    if let Err(e) = res {
+      self.last_error = Some(e.to_string());
+      return;
+    }
+
+    self.refresh();
   }
 
   /* textarea */
