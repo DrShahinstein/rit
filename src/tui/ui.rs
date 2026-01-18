@@ -51,25 +51,26 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
       if index    == ' ' { index='*';    };
       if worktree == ' ' { worktree='*'; };
 
-      let (stage_style, discard_style) = match selection_mode {
+      let (stage_style, discard_style, discard_symbol) = match selection_mode {
         SelectionMode::Stage => (
           help::checkbox_color(checked),
-          Style::default().fg(Color::DarkGray),
+          Style::default().fg(Color::Yellow),
+          "↻",
         ),
         SelectionMode::Discard => (
           Style::default().fg(Color::DarkGray),
           Style::default()
-            .fg(Color::Red)
-            .bg(Color::Black)
+            .fg(Color::LightRed)
             .add_modifier(Modifier::BOLD),
+          "[ ↻ ]",
         ),
       };
 
       let content_width = checkbox.len() + 1 + path.len() + 1 + 2;
       let padding =
       /* to push discard symbol to the right */
-      if content_width + 2 < avail_width {
-        avail_width.saturating_sub(content_width + 2)
+      if content_width + discard_symbol.len() + 1 < avail_width {
+        avail_width.saturating_sub(content_width + discard_symbol.len() - 1)
       } else {
         1 // min spacing
       };
@@ -82,7 +83,7 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
         Span::styled(index.to_string(),    help::colored(index)),
         Span::styled(worktree.to_string(), help::colored(worktree)),
         Span::raw(" ".repeat(padding)),
-        Span::styled("↻", discard_style),
+        Span::styled(discard_symbol, discard_style),
       ]);
 
       ListItem::new(line)
