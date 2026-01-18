@@ -136,6 +136,27 @@ pub fn commit(message: &str) -> Result<()> {
   }
 }
 
+pub fn discard(path: &str) -> Result<()> {
+  let root = get_git_root()?;
+  env::set_current_dir(&root)?;
+
+  let status = run(&["status", "--porcelain=v1", path])?;
+
+  if !status.is_empty() {
+    let x = status.chars().nth(0).unwrap_or(' ');
+
+    if x != ' ' && x != '?' {
+      run(&["restore", "--staged", path])?;
+    }
+  }
+
+  if status.starts_with("??") {
+    run(&["clean", "-f", path]).map(|_| ())
+  } else {
+    run(&["restore", path]).map(|_| ())
+  }
+}
+
 fn get_git_root() -> Result<String> {
   run(&["rev-parse", "--show-toplevel"])
     .map(|s| s.trim().to_string())
