@@ -1,6 +1,6 @@
 #[allow(unused_imports)]
 use ratatui::{prelude::{*}, widgets::{*}, style::{*}};
-use super::{app::App, app::RenderChoice, git::file};
+use super::{app::App, app::RenderChoice, app::SelectionMode,git::file};
 
 pub fn render(app: &mut App, frame: &mut Frame) {
   let err = app.get_last_error();
@@ -35,6 +35,9 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 }
 
 fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
+  let selection_mode = app.get_selection_mode();
+  let avail_width    = area.width.saturating_sub(6) as usize; // 2 for borders, 4 for ">> "
+
   let files: Vec<ListItem> = app
     .get_changed_files()
     .iter()
@@ -48,13 +51,38 @@ fn main_menu(app: &mut App, frame: &mut Frame, area: Rect) {
       if index    == ' ' { index='*';    };
       if worktree == ' ' { worktree='*'; };
 
+      let (stage_style, discard_style) = match selection_mode {
+        SelectionMode::Stage => (
+          help::checkbox_color(checked),
+          Style::default().fg(Color::DarkGray),
+        ),
+        SelectionMode::Discard => (
+          Style::default().fg(Color::DarkGray),
+          Style::default()
+            .fg(Color::Red)
+            .bg(Color::Black)
+            .add_modifier(Modifier::BOLD),
+        ),
+      };
+
+      let content_width = checkbox.len() + 1 + path.len() + 1 + 2;
+      let padding =
+      /* to push discard symbol to the right */
+      if content_width + 2 < avail_width {
+        avail_width.saturating_sub(content_width + 2)
+      } else {
+        1 // min spacing
+      };
+
       let line = Line::from(vec![
-        Span::styled(checkbox, help::checkbox_color(checked)),
+        Span::styled(checkbox, stage_style),
         Span::raw(" "),
         Span::raw(path),
         Span::raw(" "),
         Span::styled(index.to_string(),    help::colored(index)),
         Span::styled(worktree.to_string(), help::colored(worktree)),
+        Span::raw(" ".repeat(padding)),
+        Span::styled("↻", discard_style),
       ]);
 
       ListItem::new(line)
@@ -143,7 +171,7 @@ mod help {
 
   pub fn keys_for(choice: RenderChoice) -> &'static str {
     match choice {
-      RenderChoice::MainMenu   => "q: quit    c: commit    r: refresh",
+      RenderChoice::MainMenu   => "q: quit    c: commit    ←/→: stage/discard    r: refresh",
       RenderChoice::CommitMenu => "esc: back   commit: ctrl+s   next-line: enter",
     }
   }
